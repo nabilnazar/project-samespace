@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">project-samespace</string>
+    <string name="bottom_navigation_home">For You</string>
+    <string name="bottom_navigation_hom_2">Top Tracks</string>
+</resources>
