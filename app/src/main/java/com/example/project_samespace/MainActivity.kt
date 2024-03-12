@@ -14,10 +14,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.project_samespace.data.model.Song
 import com.example.project_samespace.ui.screens.HomeScreens
+import com.example.project_samespace.ui.screens.SongScreen
 import com.example.project_samespace.ui.screens.components.HomeScreenBottomNavigation
 import com.example.project_samespace.ui.screens.components.SongItem
 import com.example.project_samespace.ui.theme.ProjectsamespaceTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +33,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
 
-                        HomeScreens()
+                    SongScreen()
                     }
 
                 }
