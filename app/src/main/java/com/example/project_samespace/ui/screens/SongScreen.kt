@@ -1,10 +1,9 @@
 package com.example.project_samespace.ui.screens
 
-import android.content.ContentValues
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,18 +23,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowLeft
 import androidx.compose.material.icons.rounded.KeyboardArrowRight
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,7 +45,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.project_samespace.R
-import kotlin.random.Random
+import com.example.project_samespace.data.model.Song
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -58,8 +53,10 @@ import kotlin.random.Random
 fun SongScreen(
     viewModel: MusicViewModel = hiltViewModel()
 ) {
+
+    lateinit var songPlaying: Song
     val songs = viewModel.songs.value
-    val pagerState = rememberPagerState(pageCount = {viewModel.songs.value.count()})
+    val pagerState = rememberPagerState(pageCount = { viewModel.songs.value.count() })
 
     Column(modifier = Modifier.fillMaxSize()) {
         HorizontalPager(
@@ -70,6 +67,7 @@ fun SongScreen(
         ) { page ->
 
             val song = songs[page]
+            songPlaying = song
             Column() {
                 Image(
                     painter = rememberAsyncImagePainter("https://cms.samespace.com/assets/${song.cover}"),
@@ -78,14 +76,17 @@ fun SongScreen(
                         .fillMaxWidth()
                         .fillMaxHeight(0.5f)
                         .clip(RoundedCornerShape(8))
-                        //.border(5.dp,Color.Red, RoundedCornerShape(10))
+                    //.border(5.dp,Color.Red, RoundedCornerShape(10))
                     ,
                     contentScale = ContentScale.Crop
                 )
-                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text(
                         text = song.name,
-                        fontSize = 32.sp ,
+                        fontSize = 32.sp,
                         modifier = Modifier.padding(top = 16.dp)
                     )
                     Text(
@@ -98,99 +99,106 @@ fun SongScreen(
             }
         }
 
-        val currentTime:Long = 2
-        val totalTime: Long = 4
-        val sliderColors = if (isSystemInDarkTheme()) {
-            SliderDefaults.colors(
-                thumbColor = MaterialTheme.colorScheme.onBackground,
-                activeTrackColor = MaterialTheme.colorScheme.onBackground,
-                inactiveTrackColor = MaterialTheme.colorScheme.onBackground.copy(
-                    alpha = 0.24f
-                ),
-            )
-        } else SliderDefaults.colors(
-            thumbColor = Color.Red,
-            activeTrackColor = Color.Yellow ,
-            inactiveTrackColor = Color.Yellow.copy(
-                alpha = 0.24f
-            ),
-        )
-        var sliderPosition by remember{ mutableStateOf(0f) }
-        Slider(
-            value = currentTime.toFloat(),
-            modifier = Modifier.fillMaxWidth(),
-            valueRange = 0f..totalTime.toFloat(),
-            colors = sliderColors,
-            onValueChange = {sliderPosition = it},
-        )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-
-            Text(
-                text = currentTime.convertToText(),
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(8.dp),
-                color = Color.White,
-                style = TextStyle(fontWeight = FontWeight.Bold)
-            )
-
-            val remainTime = totalTime - currentTime
-            Text(
-                text = if (remainTime >= 0) remainTime.convertToText() else "",
-                modifier = Modifier
-                    .padding(8.dp),
-                color = Color.White,
-                style = TextStyle(fontWeight = FontWeight.Bold)
-            )
-        }
-        Row(
-            modifier= Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.KeyboardArrowLeft,
-                contentDescription = "Replay 10 seconds",
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .clickable(onClick = {})
-                    .padding(12.dp)
-                    .size(32.dp)
-            )
-
-            Spacer(modifier = Modifier.width(20.dp))
-            val isPlaying = listOf(true, false)
-            ControlButton(
-
-                icon = if (isPlaying.shuffled().first()) R.drawable.ic_round_pause else R.drawable.ic_round_play_arrow,
-                size = 100.dp,
-                onClick = {
-                    if (isPlaying.shuffled().first()) {
-
+        if (viewModel.totalDuration.value > 0) {
+            val sliderPosition by remember {
+                derivedStateOf {
+                    val position = viewModel.currentPlaybackPosition.value.toFloat()
+                    val total = viewModel.totalDuration.value.toFloat()
+                    if (total > 0f) {
+                        position / total
                     } else {
-
+                        0f
                     }
+                }
+            }
 
-                })
-            Spacer(modifier = Modifier.width(20.dp))
-            Icon(
-                imageVector = Icons.Rounded.KeyboardArrowRight,
-                contentDescription = "Replay 10 seconds",
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .clickable(onClick = {})
-                    .padding(12.dp)
-                    .size(32.dp)
+            Slider(
+                value = sliderPosition,
+                onValueChange = { newPosition ->
+                    val newTime = (newPosition * viewModel.totalDuration.value).toLong()
+                    viewModel.seekTo(newTime)
+                },
+                modifier = Modifier.fillMaxWidth(),
+                valueRange = 0f..1f,
             )
+            Log.e("songScreen sliderPosition:", sliderPosition.toString())
+        } else {
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
+                CircularProgressIndicator()
+            }
         }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
 
+                val currentText by remember {
+                    derivedStateOf { viewModel.currentPlaybackPosition.value.convertToText() }
+                }
+                val remainTime by remember {
+                    derivedStateOf {
+                        val remain = viewModel.totalDuration.value - viewModel.currentPlaybackPosition.value
+                        if (remain >= 0) remain.convertToText() else "00:00"
+                    }
+                }
+
+                Text(
+                    text = currentText,
+                    modifier = Modifier.padding(8.dp),
+                    color = Color.White,
+                    style = TextStyle(fontWeight = FontWeight.Bold)
+                )
+
+                Text(
+                    text = remainTime,
+                    modifier = Modifier.padding(8.dp),
+                    color = Color.White,
+                    style = TextStyle(fontWeight = FontWeight.Bold)
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.KeyboardArrowLeft,
+                    contentDescription = "Replay 10 seconds",
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable(onClick = { viewModel.seekBackward(10) })
+                        .padding(12.dp)
+                        .size(32.dp)
+                )
+
+                Spacer(modifier = Modifier.width(20.dp))
+
+                ControlButton(
+                    icon = if (viewModel.isPlaying) R.drawable.ic_round_pause else R.drawable.ic_round_play_arrow,
+                    size = 48.dp,
+                    onClick = {
+                        if (viewModel.isPlaying) {
+                            viewModel.pause()
+                        } else {
+                            viewModel.playSong(removeWhitespace(songPlaying.url)) // Ensure this is the correct URL
+                        }
+                    }
+                )
+                Spacer(modifier = Modifier.width(20.dp))
+                Icon(
+                    imageVector = Icons.Rounded.KeyboardArrowRight,
+                    contentDescription = "Replay 10 seconds",
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable(onClick = { viewModel.seekForward(10) })
+                        .padding(12.dp)
+                        .size(32.dp)
+                )
+            }
+
+        }
     }
-}
 
 private fun Long.convertToText(): String {
     val sec = this / 1000
@@ -227,4 +235,9 @@ fun ControlButton(icon: Int, size: Dp, onClick: () -> Unit) {
             contentDescription = null
         )
     }
+}
+
+
+fun removeWhitespace(string: String): String {
+    return string.replace("\\s".toRegex(), "")
 }

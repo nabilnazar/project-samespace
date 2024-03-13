@@ -12,6 +12,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.project_samespace.data.model.Song
 import com.example.project_samespace.ui.screens.HomeScreens
 import com.example.project_samespace.ui.screens.SongScreen
@@ -28,12 +31,15 @@ class MainActivity : ComponentActivity() {
         setContent {
             ProjectsamespaceTheme {
                 // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
+                val navController = rememberNavController()
 
-                    SongScreen()
+                NavHost(navController = navController, startDestination = "home") {
+                    composable("home") { HomeScreens(navController) }
+                    composable("songScreen/{songId}") { backStackEntry ->
+                        SongScreen(
+                            songId = backStackEntry.arguments?.getString("songId"),
+                            navController = navController
+                        )
                     }
 
                 }

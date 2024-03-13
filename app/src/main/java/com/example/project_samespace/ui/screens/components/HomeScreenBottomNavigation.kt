@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -13,13 +14,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.example.project_samespace.R
+import com.example.project_samespace.ui.screens.SongScreen
 
 
 @Composable
-fun HomeScreenBottomNavigation(modifier: Modifier = Modifier) {
+fun HomeScreenBottomNavigation(
+) {
     NavigationBar(
         containerColor = Color.Transparent,
-        modifier = modifier.background(color = Color.Transparent)
+        modifier = Modifier.background(color = Color.Transparent)
     ) {
         NavigationBarItem(
             icon = {
@@ -34,12 +37,12 @@ fun HomeScreenBottomNavigation(modifier: Modifier = Modifier) {
                 )
             },
             selected = true,
-            onClick = {}
+            onClick = { }
         )
         NavigationBarItem(
             icon = {
                 Icon(
-                    imageVector = Icons.Default.AccountCircle,
+                    imageVector = Icons.Default.Star,
                     contentDescription = null
                 )
             },
