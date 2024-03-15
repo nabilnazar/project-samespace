@@ -17,8 +17,7 @@ import com.example.project_samespace.ui.screens.MusicViewModel
 fun ForYouContent(navController: NavController, viewModel: MusicViewModel = hiltViewModel()) {
 
     val songs = viewModel.songs.value
-
-    LazyColumn(modifier = Modifier.background(Color.Black).fillMaxHeight()) {
+    LazyColumn(modifier = Modifier.fillMaxHeight()) {
         items(songs) { song ->
             SongItem(
                 onClick = { navController.navigate("songScreen/${song.id}") },

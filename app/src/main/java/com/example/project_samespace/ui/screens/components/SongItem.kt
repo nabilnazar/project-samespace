@@ -25,7 +25,7 @@ fun SongItem(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ){
-    Row(modifier.padding(16.dp)){
+    Row(modifier.padding(16.dp).clickable { onClick.invoke()}){
         AsyncImage(
             modifier = Modifier
                 .size(48.dp)
@@ -35,7 +35,7 @@ fun SongItem(
             contentScale = ContentScale.Crop
 
         )
-            Column(Modifier.padding(16.dp,8.dp,0.dp,0.dp).weight(1f).clickable { onClick.invoke()}
+            Column(Modifier.padding(16.dp,8.dp,0.dp,0.dp).weight(1f)
             ){
                 Text(text = song.name,style = MaterialTheme.typography.bodyLarge)
                 Text(text = song.artist,style = MaterialTheme.typography.bodyMedium)
