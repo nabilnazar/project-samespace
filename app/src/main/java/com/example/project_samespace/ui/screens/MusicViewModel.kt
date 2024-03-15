@@ -68,6 +68,10 @@ class MusicViewModel @Inject constructor(
         }
     }
 
+    fun resume(){
+        audioPlayer.resume()
+    }
+
     private fun startUpdatingPlaybackPosition() {
         viewModelScope.launch {
             withContext(Dispatchers.IO){

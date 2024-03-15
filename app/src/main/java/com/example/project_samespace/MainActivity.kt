@@ -18,7 +18,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.project_samespace.data.model.Song
 import com.example.project_samespace.ui.screens.HomeScreens
 import com.example.project_samespace.ui.screens.SongScreen
-import com.example.project_samespace.ui.screens.components.HomeScreenBottomNavigation
 import com.example.project_samespace.ui.screens.components.SongItem
 import com.example.project_samespace.ui.theme.ProjectsamespaceTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,28 +31,27 @@ class MainActivity : ComponentActivity() {
             ProjectsamespaceTheme {
                 // A surface container using the 'background' color from the theme
                 val navController = rememberNavController()
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    NavHost(navController = navController, startDestination = "home") {
+                        composable("home") {
+                            HomeScreens(navController)
+                        }
+                        composable("songScreen/{songId}") { backStackEntry ->
+                            backStackEntry.arguments?.getString("songId")?.toInt()?.let {
+                                SongScreen(
+                                    songId = it
+                                )
+                            }
+                        }
 
-                NavHost(navController = navController, startDestination = "home") {
-                    composable("home") { HomeScreens(navController) }
-                    composable("songScreen/{songId}") { backStackEntry ->
-                        SongScreen(
-                            songId = backStackEntry.arguments?.getString("songId"),
-                            navController = navController
-                        )
                     }
-
                 }
             }
         }
-    }
 
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ProjectsamespaceTheme {
 
     }
 }

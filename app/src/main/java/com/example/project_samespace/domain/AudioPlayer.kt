@@ -2,12 +2,11 @@ package com.example.project_samespace.domain
 
 import android.media.MediaPlayer
 import android.util.Log
-import java.io.IOException
 
 class AudioPlayer {
 
     private var mediaPlayer: MediaPlayer? = null
-
+    private var length = 0
     private fun isPlaying() : Boolean = mediaPlayer?.isPlaying?:false
     fun startPlaying(audioUrl: String, onDurationReady: (Long) -> Unit) {
         mediaPlayer?.release()
@@ -50,8 +49,8 @@ class AudioPlayer {
     fun getCurrentPosition(): Long = mediaPlayer?.currentPosition?.toLong()?:0L
 
     fun resume(){
-        if (!isPlaying())
-            mediaPlayer?.start()
+       mediaPlayer?.seekTo(length)
+        mediaPlayer?.start()
     }
     fun seekTo(position: Long){
         mediaPlayer?.seekTo(position.toInt())
@@ -60,6 +59,7 @@ class AudioPlayer {
     fun pause() {
         if (isPlaying()) {
             mediaPlayer?.pause()
+             length= mediaPlayer?.currentPosition!!
         }
     }
 

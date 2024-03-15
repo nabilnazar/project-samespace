@@ -46,17 +46,23 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.project_samespace.R
 import com.example.project_samespace.data.model.Song
+import kotlin.math.max
+import kotlin.math.min
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SongScreen(
-    viewModel: MusicViewModel = hiltViewModel()
+    viewModel: MusicViewModel = hiltViewModel(),
+    songId: Int
 ) {
 
     lateinit var songPlaying: Song
     val songs = viewModel.songs.value
-    val pagerState = rememberPagerState(pageCount = { viewModel.songs.value.count() })
+
+    val initialPage = songId-1
+
+    val pagerState = rememberPagerState(pageCount = { viewModel.songs.value.count()}, initialPage = initialPage)
 
     Column(modifier = Modifier.fillMaxSize()) {
         HorizontalPager(

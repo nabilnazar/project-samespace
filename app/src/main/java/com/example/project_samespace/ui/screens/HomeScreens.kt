@@ -1,38 +1,53 @@
 package com.example.project_samespace.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.example.project_samespace.data.model.Song
-import com.example.project_samespace.ui.screens.components.HomeScreenBottomNavigation
-import com.example.project_samespace.ui.screens.components.SongItem
-import com.example.project_samespace.ui.theme.ProjectsamespaceTheme
+import androidx.navigation.NavController
+import com.example.project_samespace.ui.screens.components.ForYouContent
+import com.example.project_samespace.ui.screens.components.TopTracksContent
 
 
 @Composable
-fun HomeScreens() {
-     ProjectsamespaceTheme{
-        Scaffold(
-            bottomBar = { HomeScreenBottomNavigation() }
-        ) { paddingValues ->
-            LazyColumn(modifier = Modifier.padding(paddingValues)) {
-                items(10) {
-                    SongItem(
-                        onClick = { /*TODO*/ },
-                        song = Song(
-                            name = "Song Title",
-                            artist = "Artist Name",
-                            accent = "",
-                            id = 1,
-                            top_track = true,
-                            sort = "",
-                            cover = "https://cms.samespace.com/assets/4f718272-6b0e-42ee-92d0-805b783cb471"
-                        )
-                    )
-                }
+fun HomeScreens(navController:NavController) {
+    var selectedTab by remember { mutableStateOf(0) }
+
+    Scaffold(bottomBar = {
+        NavigationBar{
+           NavigationBarItem(
+                icon = { Icon(Icons.Filled.Favorite, contentDescription = null) },
+                label = { Text("For You") },
+                selected = selectedTab == 0,
+                onClick = { selectedTab = 0 },
+            )
+            NavigationBarItem(
+                icon = { Icon(Icons.Filled.Star, contentDescription = null) },
+                label = { Text("Top Tracks") },
+                selected = selectedTab == 1,
+                onClick = { selectedTab = 1 }
+            )
+        }
+    }) {paddingValues ->
+        // Switch between tabs
+        Box(modifier = Modifier.padding(paddingValues)) {
+            when (selectedTab) {
+                0 -> ForYouContent(navController)
+                1 -> TopTracksContent(navController)
             }
         }
     }
